@@ -24,6 +24,10 @@ app.use('/api/v1/auth', authRoutes);
 const stationRoutes = require('./src/routes/stationRoutes');
 app.use('/api/v1/stations', stationRoutes);
 
+// Announcement Routes
+const announcementRoutes = require('./src/routes/announcementRoutes');
+app.use('/api/v1/announcements', announcementRoutes);
+
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/metrosync';
 

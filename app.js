@@ -5,7 +5,7 @@ const path = require('path');
 const stationRoutes = require('./src/routes/stationRoutes');
 const authRoutes = require('./src/routes/authRoutes');
 const announcementRoutes = require('./src/routes/announcementRoutes');
-const errorHandler = require('./src/middlewares/errorHandler');
+const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
 
