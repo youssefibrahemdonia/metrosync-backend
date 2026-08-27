@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>METROSYNC // STATION TELEMETRY</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    #map { height: 300px; width: 100%; border: 1px solid var(--border-dark); margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1 id="station-title">STATION CONTROL ROOM</h1>
+    <p id="station-subtitle">Real-time telemetry and schedule coordination.</p>
+  </header>
+  <hr>
+
+  <div style="padding: 0 20px; margin-bottom: 20px;">
+    <button onclick="goBack()" style="background: #333; color: #fff;">&larr; BACK TO GRID</button>
+  </div>
+  
+  <div class="grid">
+    <div class="panel">
+      <h2>GEO-SPATIAL MAP NODE</h2>
+      <p>Live GPS telemetry mapping via OpenStreetMap architecture.</p>
+      <div id="map"></div>
+    </div>
+
+    <div class="panel">
+      <h2>ACTIVE TIMETABLE SCHEDULES</h2>
+      <p>Arrival and departure logs for incoming rolling stock.</p>
+      <pre id="schedule-output">// Loading timetables...</pre>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="station.js"></script>
+</body>
+</html>

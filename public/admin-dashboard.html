@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>METROSYNC // ADMIN DASHBOARD</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="terminal-container">
+    <h2>METROSYNC ADMIN</h2>
+    <p class="terminal-subtitle">Manage transit grid stations & schedules.</p>
+
+    <!-- Add Station Form -->
+    <form id="add-station-form" class="admin-form">
+      <input type="text" id="station-name" placeholder="STATION NAME (e.g., Central Hub)" required>
+      <input type="text" id="metro-times" placeholder="METRO TIMES (e.g., 08:00 Arrival / 08:15 Departure)" required>
+      <button type="submit" class="btn-green">ADD METRO TIME & STATION</button>
+    </form>
+
+    <div id="admin-output" class="terminal-output">// System ready...</div>
+
+    <!-- Station List Section -->
+    <div class="station-management-section">
+      <h3>ACTIVE STATIONS GRID</h3>
+      <ul id="station-list" class="station-list">
+        <!-- Dynamically populated by admin.js -->
+      </ul>
+    </div>
+
+    <!-- Logout / Navigation -->
+    <div class="admin-actions">
+      <button onclick="localStorage.clear(); window.location.href='index.html';" class="btn-yellow">LOGOUT</button>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>METROSYNC // AUTH PORTAL</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="terminal-container">
+    <h2>METROSYNC TERMINAL</h2>
+    <p class="terminal-subtitle">Authenticate to access transit grid networks.</p>
+
+    <div class="auth-form">
+      <input type="email" id="auth-email" placeholder="ENTER USER EMAIL" required>
+      <input type="password" id="auth-password" placeholder="ENTER PASSWORD" required>
+      
+      <div class="btn-row">
+        <button type="button" id="register-btn" class="btn-cyan" onclick="registerUser()">REGISTER</button>
+        <button type="button" id="login-btn" class="btn-yellow" onclick="loginUser()">LOGIN</button>
+      </div>
+    </div>
+
+    <div id="auth-output" class="terminal-output">// System awaiting input...</div>
+  </div>
+
+  <script src="auth.js"></script>
+</body>
+</html>

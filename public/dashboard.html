@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>METROSYNC // USER GRID</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Real User Counter Badge -->
+  <div class="viewer-counter-badge">
+    <span class="pulse-dot"></span> REAL USERS ONLINE: <span id="viewer-count">0</span>
+  </div>
+
+  <div class="terminal-container">
+    <h2>TRANSIT GRID STATIONS</h2>
+    <p class="terminal-subtitle">Select an individual station feed to inspect telemetry and maps.</p>
+
+    <!-- GRID VIEW -->
+    <div id="station-grid-view">
+      <div class="station-management-section">
+        <ul id="user-station-list" class="station-list"></ul>
+      </div>
+    </div>
+
+    <!-- ACTIVE STATION SPLIT VIEW -->
+    <div id="active-station-view" style="display: none; flex-grow: 1; flex-direction: column;">
+      
+      <div id="announcement-banner" class="announcement-banner" style="display: none;">
+        <span id="announcement-text">// SYSTEM ALERT: SEAT RESERVED SUCCESSFULLY</span>
+      </div>
+
+      <div class="active-station-header">
+        <h3 id="active-station-title">// STATION FEED</h3>
+        <button class="btn-yellow back-btn" onclick="leaveStation()">← BACK TO ALL STATIONS</button>
+      </div>
+
+      <div class="split-station-layout">
+        <div class="station-info-panel">
+          <h4>SCHEDULED METRO TIMES & SEATING</h4>
+          <p class="panel-hint">Arrival logs & live slot reservations:</p>
+          <ul id="active-station-times" class="time-slot-list"></ul>
+        </div>
+
+        <div class="station-map-panel">
+          <h4>REAL-TIME LOCATION MAP</h4>
+          <div class="map-frame-wrapper">
+            <iframe id="station-map-iframe" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-actions">
+      <button onclick="localStorage.clear(); window.location.href='index.html';" class="btn-yellow">LOGOUT</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
