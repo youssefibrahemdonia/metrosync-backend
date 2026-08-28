@@ -1,30 +1,50 @@
 let allStationsData = [];
 let currentActiveStationId = null;
 
-document.addEventListener('DOMContentLoaded', async () => {
+const socket = io();
+
+async function loadUserStations() {
   const listEl = document.getElementById('user-station-list');
   try {
     const res = await fetch('/api/v1/stations');
     allStationsData = await res.json();
-    
+
     listEl.innerHTML = '';
     if (allStationsData.length === 0) {
       listEl.innerHTML = '<li class="station-box"><span>No active stations found in grid.</span></li>';
       return;
     }
 
-    allStationsData.forEach(station => {
+    allStationsData.forEach((station, index) => {
       const li = document.createElement('li');
-      li.className = 'station-box';
+      li.className = 'station-box fade-in-item';
+      li.style.animationDelay = `${index * 0.08}s`;
+
+      const quickTime = station.metroTimes.length > 0
+        ? station.metroTimes[0] + ' ...'
+        : 'No custom schedule — default: 09:00 AM';
+
       li.innerHTML = `
         <strong>${station.name}</strong>
-        <span>Quick Schedule: ${station.metroTimes.length > 0 ? station.metroTimes[0] + ' ...' : 'No times posted'}</span>
+        <span>Quick Schedule: ${quickTime}</span>
         <button class="btn-cyan join-station-btn" onclick="joinStation('${station._id}')">JOIN STATION</button>
       `;
       listEl.appendChild(li);
     });
   } catch (err) {
     console.error('Failed to load stations:', err);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadUserStations);
+
+// Live updates: refresh the grid whenever the admin adds/deletes a station,
+// and refresh the open station's time list if it just got a new time.
+socket.on('stationsChanged', (payload) => {
+  loadUserStations();
+
+  if (payload.type === 'timeAdded' && payload.station._id === currentActiveStationId) {
+    joinStation(currentActiveStationId);
   }
 });
 
@@ -37,30 +57,35 @@ async function joinStation(stationId) {
   document.getElementById('station-grid-view').style.display = 'none';
   const activeView = document.getElementById('active-station-view');
   activeView.style.display = 'flex';
+  activeView.classList.remove('fade-in-panel');
+  void activeView.offsetWidth;
+  activeView.classList.add('fade-in-panel');
 
   document.getElementById('active-station-title').innerText = `// FEED: ${station.name.toUpperCase()}`;
 
   const timesListEl = document.getElementById('active-station-times');
   timesListEl.innerHTML = '';
-  if (station.metroTimes && station.metroTimes.length > 0) {
-    station.metroTimes.forEach((time) => {
-      const timeLi = document.createElement('li');
-      timeLi.className = 'time-slot-item';
-      timeLi.innerHTML = `
-        <span>🕒 ${time}</span>
-        <button class="btn-green reserve-btn" onclick="reserveSlot('${station.name}', '${time}')">RESERVE</button>
-      `;
-      timesListEl.appendChild(timeLi);
-    });
-  } else {
-    timesListEl.innerHTML = '<li>No specific times logged today.</li>';
-  }
+
+  // If the admin hasn't set any metro times yet, show a single default fallback slot.
+  const timesToShow = station.metroTimes && station.metroTimes.length > 0
+    ? station.metroTimes
+    : ['09:00 AM (Default Schedule — no custom time set yet)'];
+
+  timesToShow.forEach((time, index) => {
+    const timeLi = document.createElement('li');
+    timeLi.className = 'time-slot-item fade-in-item';
+    timeLi.style.animationDelay = `${index * 0.08}s`;
+    timeLi.innerHTML = `
+      <span>🕒 ${time}</span>
+      <button class="btn-green reserve-btn" onclick="reserveSlot('${station.name}', '${time}')">RESERVE</button>
+    `;
+    timesListEl.appendChild(timeLi);
+  });
 
   const mapIframe = document.getElementById('station-map-iframe');
   const searchQuery = encodeURIComponent(station.name + ' railway station metro');
   mapIframe.src = `https://maps.google.com/maps?q=${searchQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
-  // Notify backend that a real user joined this station
   try {
     const res = await fetch(`/api/v1/stations/${stationId}/join`, { method: 'POST' });
     const data = await res.json();

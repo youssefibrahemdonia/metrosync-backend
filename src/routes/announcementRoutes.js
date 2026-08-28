@@ -1,12 +1,21 @@
 const express = require('express');
-const router = express.Router();
-const announcementController = require('../controllers/announcementController');
+const router = express.Router({ mergeParams: true });
+const { param, body } = require('express-validator');
+const { getAnnouncements, postAnnouncement } = require('../controllers/announcementController');
 const { verifyToken, requireAdmin } = require('../middleware/authMiddleware');
+const validate = require('../middleware/validate');
 
-// Public route to view announcements
-router.get('/', announcementController.getAllAnnouncements);
+const stationIdValidation = [
+  param('stationId').isMongoId().withMessage('Invalid station id.')
+];
 
-// Protected route: Only admins can create announcements
-router.post('/', verifyToken, requireAdmin, announcementController.createAnnouncement);
+const createValidation = [
+  ...stationIdValidation,
+  body('text').trim().notEmpty().withMessage('Announcement text is required.')
+];
+
+router.get('/', stationIdValidation, validate, getAnnouncements);
+
+router.post('/', verifyToken, requireAdmin, createValidation, validate, postAnnouncement);
 
 module.exports = router;

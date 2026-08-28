@@ -2,39 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>METROSYNC // ADMIN DASHBOARD</title>
+  <title>METROSYNC // ADMIN CONTROL PANEL</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body style="display: flex; justify-content: center; padding: 2rem;">
 
-  <div class="terminal-container">
-    <h2>METROSYNC ADMIN</h2>
-    <p class="terminal-subtitle">Manage transit grid stations & schedules.</p>
+  <div class="panel" style="width: 100%; max-width: 700px;">
+    <h2>METROSYNC ADMIN PANEL</h2>
+    <p>Manage transit stations and schedules.</p>
 
-    <!-- Add Station Form -->
-    <form id="add-station-form" class="admin-form">
-      <input type="text" id="station-name" placeholder="STATION NAME (e.g., Central Hub)" required>
-      <input type="text" id="metro-times" placeholder="METRO TIMES (e.g., 08:00 Arrival / 08:15 Departure)" required>
-      <button type="submit" class="btn-green">ADD METRO TIME & STATION</button>
+    <form id="add-station-form" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+      <input type="text" id="station-name" placeholder="Station Name" required>
+      <input type="text" id="station-line" placeholder="Line (e.g. Red Line)" required>
+      <input type="number" id="station-order" placeholder="Order (e.g. 1)" required>
+      <input type="text" id="metro-times" placeholder="Times, comma-separated (e.g. 08:00 AM, 09:30 AM)">
+      <button type="submit" style="background: var(--accent-cyan); color: var(--bg-dark);">ADD STATION</button>
     </form>
 
-    <div id="admin-output" class="terminal-output">// System ready...</div>
-
-    <!-- Station List Section -->
-    <div class="station-management-section">
-      <h3>ACTIVE STATIONS GRID</h3>
-      <ul id="station-list" class="station-list">
-        <!-- Dynamically populated by admin.js -->
-      </ul>
-    </div>
-
-    <!-- Logout / Navigation -->
-    <div class="admin-actions">
-      <button onclick="localStorage.clear(); window.location.href='index.html';" class="btn-yellow">LOGOUT</button>
-    </div>
+    <pre id="admin-output" style="margin-top: 1rem;">// Status: Awaiting action</pre>
   </div>
 
+  <div class="panel" style="width: 100%; max-width: 700px; margin-left: 1.5rem;">
+    <h2>STATION GRID</h2>
+    <ul id="station-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.75rem;"></ul>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>

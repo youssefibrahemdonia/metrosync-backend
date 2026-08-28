@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 
 const stationSchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
+  line: { type: String, required: true },
+  order: { type: Number, required: true },
   metroTimes: [{ type: String }] // e.g., ["08:00 AM", "09:30 AM", "11:00 AM"]
 });
 

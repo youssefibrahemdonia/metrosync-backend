@@ -1,4 +1,4 @@
-const Announcement = require('../models/Announcement');
+const Announcement = require('../models/announcementModel');
 
 const getAnnouncementsByStation = async (stationId, page = 1, limit = 10) => {
   const skip = (page - 1) * limit;
@@ -6,7 +6,7 @@ const getAnnouncementsByStation = async (stationId, page = 1, limit = 10) => {
 
   const [announcements, total] = await Promise.all([
     Announcement.find(filter)
-      .sort({ timestamp: -1 })
+      .sort({ createdAt: -1 })
       .skip(Number(skip))
       .limit(Number(limit)),
     Announcement.countDocuments(filter)

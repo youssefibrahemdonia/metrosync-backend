@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const Station = require('../src/models/Station');
+const Station = require('../src/models/stationModel');
 const stations = [
   { name: 'Downtown Central', line: 'Red Line', order: 1 },
   { name: 'City Park', line: 'Red Line', order: 2 },

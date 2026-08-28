@@ -38,21 +38,45 @@ afterAll(async () => {
   if (mongoose.connection.readyState !== 0) {
     await mongoose.connection.close();
   }
-  await server.close();
+  io.close();
+  await new Promise((resolve) => server.close(resolve));
 });
 
 describe('MetroSync Integration Tests', () => {
-  
+
   test('GET /health returns 200 and ok status', async () => {
     const res = await request(app).get('/health');
     expect(res.statusCode).toEqual(200);
     expect(res.body).toHaveProperty('status', 'ok');
   });
 
+  test('GET /api/v1/stations returns 200', async () => {
+    const res = await request(app).get('/api/v1/stations');
+    expect(res.statusCode).toEqual(200);
+  }, 10000);
+
   test('POST /api/v1/auth/login fails with invalid credentials', async () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: 'wrong@admin.com', password: 'badpassword' });
+    expect(res.statusCode).toEqual(401);
+  }, 10000);
+
+  test('POST /api/v1/auth/login succeeds with valid credentials and returns a token', async () => {
+    const res = await request(app)
+      .post('/api/v1/auth/login')
+      .send({
+        email: process.env.TEST_ADMIN_EMAIL,
+        password: process.env.TEST_ADMIN_PASSWORD
+      });
+    expect(res.statusCode).toEqual(200);
+    expect(res.body).toHaveProperty('token');
+  }, 10000);
+
+  test('POST announcement without a token returns 401', async () => {
+    const res = await request(app)
+      .post('/api/v1/stations/64a1f0000000000000000000/announcements')
+      .send({ text: 'Test announcement' });
     expect(res.statusCode).toEqual(401);
   }, 10000);
 

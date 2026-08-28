@@ -5,7 +5,7 @@ const loginAdmin = async (email, password) => {
   const admin = await Admin.findOne({ email });
   if (!admin) return null;
 
-  const isMatch = await admin.matchPassword(password);
+  const isMatch = await admin.comparePassword(password);
   if (!isMatch) return null;
 
   const token = jwt.sign(

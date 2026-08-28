@@ -1,22 +1,24 @@
-const Announcement = require('../models/announcementModel');
+const { getAnnouncementsByStation, createAnnouncement } = require('../services/announcementService');
+const catchAsync = require('../utils/catchAsync');
 
-// Get all announcements
-exports.getAllAnnouncements = async (req, res) => {
-  try {
-    const announcements = await Announcement.find();
-    res.status(200).json(announcements);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
+exports.getAnnouncements = catchAsync(async (req, res) => {
+  const { stationId } = req.params;
+  const { page, limit } = req.query;
 
-// Create a new announcement (Admin only)
-exports.createAnnouncement = async (req, res) => {
-  try {
-    const { title, message } = req.body;
-    const newAnnouncement = await Announcement.create({ title, message });
-    res.status(201).json(newAnnouncement);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+  const result = await getAnnouncementsByStation(stationId, page, limit);
+  res.json(result);
+});
+
+exports.postAnnouncement = catchAsync(async (req, res) => {
+  const { stationId } = req.params;
+  const { text } = req.body;
+
+  const announcement = await createAnnouncement(stationId, text);
+
+  const io = req.app.get('io');
+  if (io) {
+    io.to(stationId).emit('newAnnouncement', announcement);
   }
-};
+
+  res.status(201).json(announcement);
+});

@@ -15,7 +15,7 @@
     <div class="auth-form">
       <input type="email" id="auth-email" placeholder="ENTER USER EMAIL" required>
       <input type="password" id="auth-password" placeholder="ENTER PASSWORD" required>
-      
+
       <div class="btn-row">
         <button type="button" id="register-btn" class="btn-cyan" onclick="registerUser()">REGISTER</button>
         <button type="button" id="login-btn" class="btn-yellow" onclick="loginUser()">LOGIN</button>
@@ -23,6 +23,11 @@
     </div>
 
     <div id="auth-output" class="terminal-output">// System awaiting input...</div>
+  </div>
+
+  <div id="role-announcement" class="role-announcement-overlay">
+    <div class="scanline"></div>
+    <div id="role-announcement-text" class="role-announcement-text"></div>
   </div>
 
   <script src="auth.js"></script>
