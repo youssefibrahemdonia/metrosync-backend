@@ -15,6 +15,14 @@ const initSockets = (io) => {
       incrementViewer(io, stationId);
     });
 
+    socket.on('leaveStation', () => {
+      if (currentRoom) {
+        socket.leave(currentRoom);
+        decrementViewer(io, currentRoom);
+        currentRoom = null;
+      }
+    });
+
     socket.on('disconnect', () => {
       if (currentRoom) {
         decrementViewer(io, currentRoom);

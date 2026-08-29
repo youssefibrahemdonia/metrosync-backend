@@ -5,7 +5,7 @@
   <title>METROSYNC // ADMIN CONTROL PANEL</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body style="display: flex; justify-content: center; padding: 2rem;">
+<body style="display: flex; justify-content: center; padding: 2rem; flex-wrap: wrap; gap: 1.5rem;">
 
   <div class="panel" style="width: 100%; max-width: 700px;">
     <h2>METROSYNC ADMIN PANEL</h2>
@@ -22,9 +22,24 @@
     <pre id="admin-output" style="margin-top: 1rem;">// Status: Awaiting action</pre>
   </div>
 
-  <div class="panel" style="width: 100%; max-width: 700px; margin-left: 1.5rem;">
+  <div class="panel" style="width: 100%; max-width: 700px;">
     <h2>STATION GRID</h2>
     <ul id="station-list" style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.75rem;"></ul>
+  </div>
+
+  <div class="panel" style="width: 100%; max-width: 700px;">
+    <h2>BROADCAST ANNOUNCEMENT</h2>
+    <p>Send a live announcement to everyone currently viewing a station.</p>
+
+    <form id="add-announcement-form" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
+      <select id="announcement-station-select" required>
+        <option value="" disabled selected>Select a station...</option>
+      </select>
+      <textarea id="announcement-text" placeholder="Announcement text..." rows="3" required style="background: #181818; border: 1px solid #444; color: #00f0ff; padding: 14px; font-family: inherit; font-size: 0.95rem; resize: vertical;"></textarea>
+      <button type="submit" style="background: var(--accent-yellow); color: var(--bg-dark);">BROADCAST</button>
+    </form>
+
+    <pre id="announcement-output" style="margin-top: 1rem;">// Status: Awaiting action</pre>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>

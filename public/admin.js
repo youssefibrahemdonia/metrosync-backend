@@ -28,41 +28,57 @@ function extractErrorMessage(data) {
 
 async function loadStations() {
   const stationListElement = document.getElementById('station-list');
-  if (!stationListElement) return;
+  const selectElement = document.getElementById('announcement-station-select');
 
   try {
     const res = await fetch('/api/v1/stations');
     const stations = await res.json();
 
-    stationListElement.innerHTML = '';
+    if (stationListElement) {
+      stationListElement.innerHTML = '';
 
-    if (stations.length === 0) {
-      stationListElement.innerHTML = '<li class="station-box"><span>No stations found in grid.</span></li>';
-      return;
+      if (stations.length === 0) {
+        stationListElement.innerHTML = '<li class="station-box"><span>No stations found in grid.</span></li>';
+      } else {
+        stations.forEach((station, index) => {
+          const li = document.createElement('li');
+          li.className = 'station-box fade-in-item';
+          li.style.animationDelay = `${index * 0.08}s`;
+
+          const timesFormatted = station.metroTimes && station.metroTimes.length > 0
+            ? station.metroTimes.join(' | ')
+            : 'No scheduled times set';
+
+          li.innerHTML = `
+            <div class="station-info">
+              <strong>${station.name}</strong>
+              <span>Line: ${station.line} | Order: ${station.order}</span>
+              <span>Schedule (Arrival/Leave): ${timesFormatted}</span>
+            </div>
+            <div class="station-btn-row">
+              <button class="btn-green" onclick="addMetroTimeToStation('${station._id}')">ADD TIME</button>
+              <button class="btn-red" onclick="deleteStation('${station._id}')">DELETE</button>
+            </div>
+          `;
+          stationListElement.appendChild(li);
+        });
+      }
     }
 
-    stations.forEach((station, index) => {
-      const li = document.createElement('li');
-      li.className = 'station-box fade-in-item';
-      li.style.animationDelay = `${index * 0.08}s`;
-
-      const timesFormatted = station.metroTimes && station.metroTimes.length > 0
-        ? station.metroTimes.join(' | ')
-        : 'No scheduled times set';
-
-      li.innerHTML = `
-        <div class="station-info">
-          <strong>${station.name}</strong>
-          <span>Line: ${station.line} | Order: ${station.order}</span>
-          <span>Schedule (Arrival/Leave): ${timesFormatted}</span>
-        </div>
-        <div class="station-btn-row">
-          <button class="btn-green" onclick="addMetroTimeToStation('${station._id}')">ADD TIME</button>
-          <button class="btn-red" onclick="deleteStation('${station._id}')">DELETE</button>
-        </div>
-      `;
-      stationListElement.appendChild(li);
-    });
+    // Keep the announcement dropdown in sync with the current station list.
+    if (selectElement) {
+      const previousValue = selectElement.value;
+      selectElement.innerHTML = '<option value="" disabled selected>Select a station...</option>';
+      stations.forEach(station => {
+        const option = document.createElement('option');
+        option.value = station._id;
+        option.innerText = `${station.name} (${station.line})`;
+        selectElement.appendChild(option);
+      });
+      if (stations.some(s => s._id === previousValue)) {
+        selectElement.value = previousValue;
+      }
+    }
   } catch (err) {
     console.error('Error loading stations:', err);
   }
@@ -170,7 +186,58 @@ async function deleteStation(id) {
   }
 }
 
+async function postAnnouncement(event) {
+  event.preventDefault();
+
+  const stationSelect = document.getElementById('announcement-station-select');
+  const textInput = document.getElementById('announcement-text');
+  const output = document.getElementById('announcement-output');
+
+  const stationId = stationSelect.value;
+  const text = textInput.value.trim();
+
+  if (!stationId) {
+    output.innerText = 'ERROR: Please select a station.';
+    return;
+  }
+
+  if (!text) {
+    output.innerText = 'ERROR: Announcement text is required.';
+    return;
+  }
+
+  const token = localStorage.getItem('token');
+
+  try {
+    const res = await fetch(`/api/v1/stations/${stationId}/announcements`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ text })
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      output.innerText = 'SUCCESS: Announcement broadcast to live viewers.';
+      textInput.value = '';
+    } else {
+      output.innerText = `ERROR: ${extractErrorMessage(data)}`;
+    }
+  } catch (err) {
+    console.error('Error posting announcement:', err);
+    output.innerText = 'ERROR: Network request failed.';
+  }
+}
+
 const addForm = document.getElementById('add-station-form');
 if (addForm) {
   addForm.addEventListener('submit', addStation);
+}
+
+const announcementForm = document.getElementById('add-announcement-form');
+if (announcementForm) {
+  announcementForm.addEventListener('submit', postAnnouncement);
 }

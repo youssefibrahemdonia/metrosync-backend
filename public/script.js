@@ -38,8 +38,6 @@ async function loadUserStations() {
 
 document.addEventListener('DOMContentLoaded', loadUserStations);
 
-// Live updates: refresh the grid whenever the admin adds/deletes a station,
-// and refresh the open station's time list if it just got a new time.
 socket.on('stationsChanged', (payload) => {
   loadUserStations();
 
@@ -47,6 +45,35 @@ socket.on('stationsChanged', (payload) => {
     joinStation(currentActiveStationId);
   }
 });
+
+socket.on('presenceUpdate', ({ stationId, viewerCount }) => {
+  if (stationId === currentActiveStationId) {
+    document.getElementById('viewer-count').innerText = viewerCount;
+  }
+});
+
+// Live announcement broadcast — only shown if the user is currently viewing that station.
+socket.on('newAnnouncement', (announcement) => {
+  if (announcement.station === currentActiveStationId) {
+    showAnnouncementBanner(`// ADMIN ANNOUNCEMENT: ${announcement.text}`);
+  }
+});
+
+function showAnnouncementBanner(message) {
+  const banner = document.getElementById('announcement-banner');
+  const bannerText = document.getElementById('announcement-text');
+
+  bannerText.innerText = message;
+  banner.style.display = 'block';
+
+  banner.classList.remove('glow-effect');
+  void banner.offsetWidth;
+  banner.classList.add('glow-effect');
+
+  setTimeout(() => {
+    banner.style.display = 'none';
+  }, 6000);
+}
 
 async function joinStation(stationId) {
   const station = allStationsData.find(s => s._id === stationId);
@@ -66,7 +93,6 @@ async function joinStation(stationId) {
   const timesListEl = document.getElementById('active-station-times');
   timesListEl.innerHTML = '';
 
-  // If the admin hasn't set any metro times yet, show a single default fallback slot.
   const timesToShow = station.metroTimes && station.metroTimes.length > 0
     ? station.metroTimes
     : ['09:00 AM (Default Schedule — no custom time set yet)'];
@@ -86,25 +112,12 @@ async function joinStation(stationId) {
   const searchQuery = encodeURIComponent(station.name + ' railway station metro');
   mapIframe.src = `https://maps.google.com/maps?q=${searchQuery}&t=&z=15&ie=UTF8&iwloc=&output=embed`;
 
-  try {
-    const res = await fetch(`/api/v1/stations/${stationId}/join`, { method: 'POST' });
-    const data = await res.json();
-    document.getElementById('viewer-count').innerText = data.count;
-  } catch (err) {
-    console.error('Error updating viewer count:', err);
-  }
+  socket.emit('joinStation', { stationId });
 }
 
-async function leaveStation() {
-  if (currentActiveStationId) {
-    try {
-      const res = await fetch(`/api/v1/stations/${currentActiveStationId}/leave`, { method: 'POST' });
-      await res.json();
-    } catch (err) {
-      console.error('Error leaving station:', err);
-    }
-    currentActiveStationId = null;
-  }
+function leaveStation() {
+  socket.emit('leaveStation');
+  currentActiveStationId = null;
 
   document.getElementById('announcement-banner').style.display = 'none';
   document.getElementById('active-station-view').style.display = 'none';
@@ -112,17 +125,5 @@ async function leaveStation() {
 }
 
 function reserveSlot(stationName, timeString) {
-  const banner = document.getElementById('announcement-banner');
-  const bannerText = document.getElementById('announcement-text');
-
-  bannerText.innerText = `// SUCCESS: TICKET SECURED FOR ${stationName.toUpperCase()} AT ${timeString}`;
-  banner.style.display = 'block';
-
-  banner.classList.remove('glow-effect');
-  void banner.offsetWidth;
-  banner.classList.add('glow-effect');
-
-  setTimeout(() => {
-    banner.style.display = 'none';
-  }, 5000);
+  showAnnouncementBanner(`// SUCCESS: TICKET SECURED FOR ${stationName.toUpperCase()} AT ${timeString}`);
 }
