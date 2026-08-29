@@ -1,6 +1,9 @@
-# https://metrosync-backend-beta.vercel.app/ 
+# https://metrosync-backend-beta.vercel.app/
 # this is the deplyment link
 
+
+# https://github.com/youssefibrahemdonia/metrosync-backend.git
+## git hub repo 
 # METROSYNC // TRANSIT GRID TERMINAL
 
 A full-stack web application designed for monitoring transit grid stations, managing arrival schedules, reserving seating slots, and tracking live user telemetry across stations.
